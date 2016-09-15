@@ -1,0 +1,4 @@
+#forum_posts .post .post h4,
+#forum_posts .post .post .in-reply-to {
+  display: none;
+}

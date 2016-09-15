@@ -1,0 +1,16 @@
+{
+  "manifest_version": 2,
+  "name": "mov css, reg",
+  "description": "Tidy up theregister.co.uk, especially the abomination that is the comments section",
+  "version": "1.0",
+  "permissions": [
+    "activeTab"
+  ],
+  "content_scripts": [
+      {
+        "matches": ["http://*.theregister.co.uk/*"],
+        "js": ["main.js"],
+        "css": ["styles.css"]
+      }
+  ]
+}
