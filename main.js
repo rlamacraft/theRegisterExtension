@@ -67,16 +67,24 @@ function parseForumPosts(forum_posts_container) {
 function renderForumPosts(rootForumPosts, forumPostsContainer) {
 
   /* Recursively render the forumPost and all of its children recursively */
-  function renderPost(post) {
+  function renderPost(post, depth) {
+    const colours = ['#1e88e5', '#ab47bc', '#4caf50', '#fb8c00', '#e53935'];
+
+    let postWrapper = document.createElement('div');
+    postWrapper.className ='postWrapper';
     let postHTML = post.html;
+    //postHTML.styles = 'color: red';
+    postHTML.style = 'border-left-color: ' + colours[depth % 5] + ' !important';
+    //debugger;
+    postWrapper.appendChild(postHTML);
     for(eachChildPost of post.children) {
-      postHTML.appendChild(renderPost(eachChildPost));
+      postWrapper.appendChild(renderPost(eachChildPost, depth + 1));
     }
-    return(postHTML);
+    return(postWrapper);
   }
 
   forumPostsContainer.innerHTML = "";
   for (eachRootPost of rootForumPosts) {
-    forumPostsContainer.appendChild(renderPost(eachRootPost));
+    forumPostsContainer.appendChild(renderPost(eachRootPost, 0));
   }
 }

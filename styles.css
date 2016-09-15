@@ -1,4 +1,23 @@
-#forum_posts .post .post h4,
-#forum_posts .post .post .in-reply-to {
+#forum_posts {
+    padding-left: 0 !important;
+    border: none !important;
+}
+
+#forum_posts .postWrapper .postWrapper .post h4,
+#forum_posts .postWrapper .postWrapper .post .reply-bar {
   display: none;
+}
+
+#forum_posts .postWrapper .postWrapper {
+  padding-left: 5px;
+}
+
+#forum_posts .postWrapper .post {
+  border-left-width: 5px !important;
+  border-left-style: solid !important;
+  border-bottom: 1px solid #ccc !important;
+}
+
+#forum_posts .post .body {
+  margin-left: 10px !important;
 }
