@@ -73,9 +73,7 @@ function renderForumPosts(rootForumPosts, forumPostsContainer) {
     let postWrapper = document.createElement('div');
     postWrapper.className ='postWrapper';
     let postHTML = post.html;
-    //postHTML.styles = 'color: red';
     postHTML.style = 'border-left-color: ' + colours[depth % 5] + ' !important';
-    //debugger;
     postWrapper.appendChild(postHTML);
     for(eachChildPost of post.children) {
       postWrapper.appendChild(renderPost(eachChildPost, depth + 1));
