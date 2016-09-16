@@ -73,6 +73,13 @@ function renderForumPosts(rootForumPosts, forumPostsContainer) {
   function renderPost(post, depth) {
     const colours = ['#1e88e5', '#ab47bc', '#4caf50', '#fb8c00', '#e53935'];
 
+    function inert(isClosed, actionsContainer, childPostWrappers) {
+      actionsContainer.inert = isClosed;
+      for(eachChildPost of childPostWrappers) {
+        eachChildPost.inert = isClosed;
+      }
+    }
+
     let postWrapper = document.createElement('div');
     postWrapper.className = 'postWrapper';
     let postHTML = post.html;
@@ -82,16 +89,21 @@ function renderForumPosts(rootForumPosts, forumPostsContainer) {
     toggleButton.innerText = 'close';
     toggleButton.addEventListener('click', function(evt) { // toggle open-close functionality
       const btn = evt.target;
+      const postWrapper = btn.parentNode.parentNode;
+      const actionsContainer = btn.parentNode.getElementsByClassName('actions')[0];
+      const childPostWrappers = postWrapper.getElementsByClassName('postWrapper');
+      let isClosed = postWrapper.hasAttribute('closed');
 
-      if(btn.innerText === 'close') {
+      if(!isClosed) {
         btn.innerText = 'open';
-        btn.parentNode.parentNode.className += " hidden";
-      } else if (btn.innerText === 'open') {
-        btn.innerText = 'close';
-        btn.parentNode.parentNode.className = btn.parentNode.parentNode.className.replace(' hidden','');
+        postWrapper.setAttribute('closed', 'closed');
+        inert(true, actionsContainer, childPostWrappers);
       } else {
-        console.error('Cannot toggle post.');
+        btn.innerText = 'close';
+        postWrapper.removeAttribute('closed');
+        inert(false, actionsContainer, childPostWrappers);
       }
+
     });
     postHTML.insertBefore(toggleButton, postHTML.firstElementChild)
     postWrapper.appendChild(postHTML);

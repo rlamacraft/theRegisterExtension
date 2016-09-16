@@ -36,16 +36,16 @@
   margin-left: 5px !important;
 }
 
-.postWrapper.hidden {
+.postWrapper[closed] {
   height: 29px;
   overflow: hidden;
 }
 
-.postWrapper.hidden .dateline,
-.postWrapper.hidden .report {
+.postWrapper[closed] .dateline,
+.postWrapper[closed] .report {
   display: none;
 }
 
-.postWrapper.hidden p.disposition {
+.postWrapper[closed] p.disposition {
   margin-top: 3px;
 }
