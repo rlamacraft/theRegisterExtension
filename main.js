@@ -21,13 +21,15 @@ if(window.location.hostname == "forums.theregister.co.uk") {
 **/
 function parseForumPosts(forum_posts_container) {
 
-  /* Get the Id of the post, from the id of the permalink anchor tag */
+  /* Get the Id of the post, from the id of the permalink anchor tag. Returns undefined if post is deleted. */
   function extractId(forumPost_html) {
+    if(forumPost_html.classList.contains('deleted'))
+      return undefined;
     const permalink = forumPost_html.getElementsByClassName("permalink")[0];
     return( permalink.getAttribute("id").substr(2) ); // id is 'c_#######', so .substr(2) drops the 'c_'
   }
 
-  /* Get the parent Id of the post, from the in-reply-to link. Returns empty string if root node. */
+  /* Get the parent Id of the post, from the in-reply-to link. Returns undefined if root node. */
   function extractParentId(forumPost_html) {
     try {
       const reply_to = forumPost_html.getElementsByClassName("in-reply-to")[0];
@@ -35,12 +37,12 @@ function parseForumPosts(forum_posts_container) {
       const reply_to_link_parts = reply_to_link.split("/");
       return( reply_to_link_parts[reply_to_link_parts.length - 1] );
     } catch(err) {
-      return("");
+      return(undefined);
     }
   }
 
-  forumPosts = {};
-  rootForumPosts = [];
+  let forumPosts = {};
+  let rootForumPosts = [];
 
   let forumPosts_html = forum_posts_container.getElementsByClassName("post");
 
@@ -49,8 +51,9 @@ function parseForumPosts(forum_posts_container) {
     const parentId = extractParentId(eachForumPost_html);
 
     const newForumPost = new forumPost(id, parentId, eachForumPost_html);
-    forumPosts[id] = newForumPost;
-    if(parentId != "") {
+    if(newForumPost.id !== undefined)
+      forumPosts[id] = newForumPost;
+    if(parentId !== undefined) {
       forumPosts[parentId].children.push(newForumPost);
     } else {
       rootForumPosts.push(newForumPost);
