@@ -31,6 +31,11 @@
   margin-top: 3px !important;
 }
 
+.actions {
+  padding-left: 0 !important;
+  margin-left: 5px !important;
+}
+
 .postWrapper.hidden {
   height: 29px;
   overflow: hidden;
