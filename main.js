@@ -74,9 +74,26 @@ function renderForumPosts(rootForumPosts, forumPostsContainer) {
     const colours = ['#1e88e5', '#ab47bc', '#4caf50', '#fb8c00', '#e53935'];
 
     let postWrapper = document.createElement('div');
-    postWrapper.className ='postWrapper';
+    postWrapper.className = 'postWrapper';
     let postHTML = post.html;
     postHTML.style = 'border-left-color: ' + colours[depth % 5] + ' !important';
+    const toggleButton = document.createElement('button');
+    toggleButton.className = 'reg_btn post_toggle';
+    toggleButton.innerText = 'close';
+    toggleButton.addEventListener('click', function(evt) { // toggle open-close functionality
+      const btn = evt.target;
+
+      if(btn.innerText === 'close') {
+        btn.innerText = 'open';
+        btn.parentNode.parentNode.className += " hidden";
+      } else if (btn.innerText === 'open') {
+        btn.innerText = 'close';
+        btn.parentNode.parentNode.className = btn.parentNode.parentNode.className.replace(' hidden','');
+      } else {
+        console.error('Cannot toggle post.');
+      }
+    });
+    postHTML.insertBefore(toggleButton, postHTML.firstElementChild)
     postWrapper.appendChild(postHTML);
     for(eachChildPost of post.children) {
       postWrapper.appendChild(renderPost(eachChildPost, depth + 1));

@@ -21,3 +21,26 @@
 #forum_posts .post .body {
   margin-left: 10px !important;
 }
+
+.post_toggle {
+  float: left;
+  margin-right: 5px;
+}
+
+.author {
+  margin-top: 3px !important;
+}
+
+.postWrapper.hidden {
+  height: 29px;
+  overflow: hidden;
+}
+
+.postWrapper.hidden .dateline,
+.postWrapper.hidden .report {
+  display: none;
+}
+
+.postWrapper.hidden p.disposition {
+  margin-top: 3px;
+}
