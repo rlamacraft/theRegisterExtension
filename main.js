@@ -1,3 +1,5 @@
+var numOfAdditionalPages = 0; // ensure all additional pages have been fetched before parsing
+
 /**
 ** Model of a single post, forms the node on a tree of posts and replies
 **/
@@ -11,21 +13,93 @@ class forumPost {
 }
 
 if(window.location.hostname == "forums.theregister.co.uk") {
+  document.getElementsByClassName("forums-page-nav")[0].style.display = "none";
+
+  //redirect if on an additional page
+  const regex = new RegExp("/forum/(\\d)/(.*)");
+  const pathnameParts = regex.exec(window.location.pathname);
+  if(pathnameParts[1] !== "1") {
+    window.location = "http://forums.theregister.co.uk/forum/1/" + pathnameParts[2];
+  }
+
+  let forumPosts = {};
+  let rootForumPosts = [];
+
+  // parse local posts
   const forumPostsContainer = document.getElementById("forum_posts");
-  const parsedForumPosts = parseForumPosts(forumPostsContainer);
-  renderForumPosts(parsedForumPosts, forumPostsContainer);
+  parseForumPosts(forumPostsContainer, forumPosts, rootForumPosts);
+
+  // get links to additional pages
+  const additionalPageLinks = document.getElementsByClassName("forums-page-nav")[0].getElementsByTagName("a");
+
+  // remove the 'next page' link as we only care about the numbered pages and convert to array so that we can remove the pages as they have been parsed
+  const additionalPages = [];
+  for( let eachNode = 0; eachNode < additionalPageLinks.length - 1; ++eachNode ) {
+    additionalPages.push(additionalPageLinks[eachNode]);
+  }
+  numOfAdditionalPages = additionalPages.length;
+
+  // if there are additional pages, fetch and parse before rendering
+  if(additionalPages.length > 0) {
+    const additionalPagesHTMLContent = new Array(additionalPages.length);
+    additionalPages.forEach(function(value, index) {
+      additionalPagesHTMLContent[index] = getAdditionPagePostContainer(value, function(content) {
+        additionalPagesHTMLContent[index] = content;
+        additionalPagesHTMLContent.forEach(function(value, index) {
+          parseForumPosts(value, forumPosts, rootForumPosts);
+        });
+        renderForumPosts(rootForumPosts, forumPostsContainer);
+      });
+    });
+  } else {
+    renderForumPosts(rootForumPosts, forumPostsContainer); // skip if there are no additional pages, just render the one page
+  }
+}
+
+/*
+** Get the container of the posts on a given additional pages of posts
+*/
+function getAdditionPagePostContainer(additionalPage, finishedCallback) {
+  let returnedAdditionalPageContent = 0;
+
+  function processResponse(responseText) {
+    returnedAdditionalPageContent++;
+
+    const content = document.createElement('html');
+    content.innerHTML = xmlHttp.responseText;
+    const postsContainer = content.querySelector("#forum_posts");
+
+    if(returnedAdditionalPageContent == numOfAdditionalPages) {
+      finishedCallback(postsContainer);
+    } else {
+      return(postsContainer);
+    }
+  }
+
+  const additionalPageURL = additionalPage.getAttribute("href");
+  const xmlHttp = new XMLHttpRequest();
+  xmlHttp.onreadystatechange = function() {
+      if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+        processResponse(xmlHttp.responseText);
+      }
+  }
+  xmlHttp.open("GET", additionalPageURL, true); // true for asynchronous
+  xmlHttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+  xmlHttp.send();
 }
 
 /**
 ** Parses the HTML of the posts to extract the data necessary to build a tree of all posts and replies
 **/
-function parseForumPosts(forum_posts_container) {
+function parseForumPosts(forum_posts_container, forumPosts, rootForumPosts) {
 
   /* Get the Id of the post, from the id of the permalink anchor tag. Returns undefined if post is deleted. */
   function extractId(forumPost_html) {
     if(forumPost_html.classList.contains('deleted'))
       return undefined;
     const permalink = forumPost_html.getElementsByClassName("permalink")[0];
+    if(permalink === undefined)
+      debugger;
     return( permalink.getAttribute("id").substr(2) ); // id is 'c_#######', so .substr(2) drops the 'c_'
   }
 
@@ -41,9 +115,6 @@ function parseForumPosts(forum_posts_container) {
     }
   }
 
-  let forumPosts = {};
-  let rootForumPosts = [];
-
   let forumPosts_html = forum_posts_container.getElementsByClassName("post");
 
   for (eachForumPost_html of forumPosts_html) {
@@ -58,10 +129,7 @@ function parseForumPosts(forum_posts_container) {
     } else {
       rootForumPosts.push(newForumPost);
     }
-
   }
-
-  return rootForumPosts;
 }
 
 /**
