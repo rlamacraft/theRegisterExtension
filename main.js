@@ -13,7 +13,8 @@ class forumPost {
 }
 
 if(window.location.hostname == "forums.theregister.co.uk") {
-  document.getElementsByClassName("forums-page-nav")[0].style.display = "none";
+  if(document.getElementsByClassName("forums-page-nav").length !== 0)
+    document.getElementsByClassName("forums-page-nav")[0].style.display = "none";
 
   //redirect if on an additional page
   const regex = new RegExp("/forum/(\\d)/(.*)");
@@ -30,7 +31,9 @@ if(window.location.hostname == "forums.theregister.co.uk") {
   parseForumPosts(forumPostsContainer, forumPosts, rootForumPosts);
 
   // get links to additional pages
-  const additionalPageLinks = document.getElementsByClassName("forums-page-nav")[0].getElementsByTagName("a");
+  const additionalPageLinks = [];
+  if(document.getElementsByClassName("forums-page-nav").length > 0)
+    document.getElementsByClassName("forums-page-nav")[0].getElementsByTagName("a");
 
   // remove the 'next page' link as we only care about the numbered pages and convert to array so that we can remove the pages as they have been parsed
   const additionalPages = [];
